@@ -21,13 +21,12 @@ export default function CategoriesTable (){
   useEffect(() => {
     axios.get('http://localhost:8080/categories')
     .then(response => {
-      console.log("CATRESPONSE>>>", response.data)
       setCategories(response.data)
     })
     .catch(error =>{
       console.log(error)
     })
-  }, [])
+  }, [categories])
 
   const handleChange = (e) => {
     setState({
@@ -37,18 +36,14 @@ export default function CategoriesTable (){
   }
 
   const handleSubmit = (e) => {
-    "use server"
     axios.post("http://localhost:8080/categories", {
       name: state.name,
       description: state.description
     })
     .then((response) => {
       const data = response.data
-      console.log("CATDATA>>>", data)
     })
     .catch((console.error()))
-
-    revalidatePath("dashboard/categories")
   }
 
   const onCloseModal = () =>{
