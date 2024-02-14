@@ -8,7 +8,8 @@ const links = [
   {name: 'Dashboard', href: '/dashboard', icon: HomeIcon},
   {name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon},
   {name: 'Orders', href: '/dashboard/orders', icon: ShoppingCartIcon},
-  {name: 'Products', href: '/dashboard/products', icon: ShoppingCartIcon}
+  {name: 'Products', href: '/dashboard/products', icon: ShoppingCartIcon},
+  {name: 'Categories', href: '/dashboard/categories', icon: ShoppingCartIcon}
 ]
 
 export default function NavLinks(){
