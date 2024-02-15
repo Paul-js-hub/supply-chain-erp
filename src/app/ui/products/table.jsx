@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Modal,
   TextInput,
@@ -10,6 +11,7 @@ import {
 } from "flowbite-react";
 export default function ProductsTable() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
   const [state, setState] = useState({
@@ -25,11 +27,43 @@ export default function ProductsTable() {
     });
   }
 
+  useEffect(() => {
+    axios.get('http://localhost:8080/categories')
+    .then(response => {
+      console.log("RRESPONSE>>>", response.data)
+      setCategories(response.data)
+    })
+    .catch(error =>{
+      console.log(error)
+    })
+  }, [])
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/products')
+    .then(response => {
+      setProducts(response.data)
+    })
+    .catch(error =>{
+      console.log(error)
+    })
+  }, [])
+
   const handleAddProducts = (e) =>{
-    setProducts([
-      ...products,
-      {name: state.name, description: state.description, price: state.price, selectedValue: selectedValue}
-    ])
+    // setProducts([
+    //   ...products,
+    //   {name: state.name, description: state.description, price: state.price, selectedValue: selectedValue}
+    // ])
+
+    axios.post("http://localhost:8080/products", {
+      name: state.name,
+      description: state.description,
+      price:state.price,
+      categoryID: 1
+    })
+    .then((response) => {
+      setProducts(response.data)
+    })
+    .catch((console.error()))
   }
   function onCloseModal() {
     setOpenModal(false);
@@ -37,7 +71,7 @@ export default function ProductsTable() {
     setSelectedValue("")
   }
 
-  const categories = ["Electronics", "Food", "Clothing", "Computers", "Utensils", "Furniture"]
+  // const categories = ["Electronics", "Food", "Clothing", "Computers", "Utensils", "Furniture"]
 
   const handleChangeProductCategory = (e) =>{
     setSelectedValue(e.target.value)
@@ -80,7 +114,7 @@ export default function ProductsTable() {
                   <option>Choose Category</option>
                   {categories.map((category) => {
                     return (
-                      <option key={category}>{category}</option>
+                      <option key={category.id}>{category.name}</option>
                     );
                   })}
                 </Select>
@@ -133,6 +167,7 @@ export default function ProductsTable() {
         </thead>
         <tbody>
         {products.map((product) => {
+          console.log("PRODUCT>>>", product)
           return (
           <>
           <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">

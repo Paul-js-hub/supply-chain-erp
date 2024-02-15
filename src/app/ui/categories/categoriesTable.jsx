@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from "react";
-import { revalidatePath } from "next/cache";
 import axios from "axios"
 import {
     Modal,
@@ -26,7 +25,7 @@ export default function CategoriesTable (){
     .catch(error =>{
       console.log(error)
     })
-  }, [categories])
+  }, [])
 
   const handleChange = (e) => {
     setState({
