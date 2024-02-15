@@ -9,11 +9,13 @@ import {
   Select,
   Textarea,
 } from "flowbite-react";
+import CategorySelect from '@/app/ui/categorySelect';
+
 export default function ProductsTable() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("");
+  const [categoryID, setCategoryID] = useState("");
+  const [categories, setCategories] = useState([]);
   const [state, setState] = useState({
     name: '',
     description: '',
@@ -41,6 +43,7 @@ export default function ProductsTable() {
   useEffect(() => {
     axios.get('http://localhost:8080/products')
     .then(response => {
+      console.log("Productsres>>>", response)
       setProducts(response.data)
     })
     .catch(error =>{
@@ -49,16 +52,11 @@ export default function ProductsTable() {
   }, [])
 
   const handleAddProducts = (e) =>{
-    // setProducts([
-    //   ...products,
-    //   {name: state.name, description: state.description, price: state.price, selectedValue: selectedValue}
-    // ])
-
     axios.post("http://localhost:8080/products", {
       name: state.name,
       description: state.description,
       price:state.price,
-      categoryID: 1
+      categoryID:categoryID
     })
     .then((response) => {
       setProducts(response.data)
@@ -68,13 +66,10 @@ export default function ProductsTable() {
   function onCloseModal() {
     setOpenModal(false);
     setState("");
-    setSelectedValue("")
   }
 
-  // const categories = ["Electronics", "Food", "Clothing", "Computers", "Utensils", "Furniture"]
-
   const handleChangeProductCategory = (e) =>{
-    setSelectedValue(e.target.value)
+    setCategoryID(e.target.value)
   }
 
   return (
@@ -110,11 +105,11 @@ export default function ProductsTable() {
                 <div className="mb-2 block">
                   <Label htmlFor="catgeory" value="Category" />
                 </div>
-                <Select onChange={handleChangeProductCategory} value={selectedValue} required>
+                <Select onChange={handleChangeProductCategory} value={categoryID}required>
                   <option>Choose Category</option>
                   {categories.map((category) => {
                     return (
-                      <option key={category.id}>{category.name}</option>
+                      <option key={category.id} value={category.id}>{category.name}</option>
                     );
                   })}
                 </Select>
@@ -178,7 +173,7 @@ export default function ProductsTable() {
               >
               {product.name}
             </th>
-            <td className="px-6 py-4">{product.selectedValue}</td>
+            <td className="px-6 py-4">{categories.map((cat) => (product.categoryID === cat.id) ? cat.name : "")}</td>
             <td className="px-6 py-4">${product.price}</td>
             <td className="px-6 py-4 text-right">
               <a
@@ -190,7 +185,7 @@ export default function ProductsTable() {
             </td> 
           </tr>
           </>);
-          })}
+        })}
         </tbody>
       </table>
     </div>
