@@ -17,66 +17,73 @@ export default function ProductsTable() {
   const [categories, setCategories] = useState([]);
   const [updateProduct, setUpdateProduct] = useState(false);
   const [state, setState] = useState({
-    name: '',
-    description: '',
-    price: ''
+    name: "",
+    description: "",
+    price: "",
   });
 
   const handleChange = (e) => {
     setState({
       ...state,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-  }
+  };
 
   useEffect(() => {
-    axios.get('http://localhost:8080/categories')
-    .then(response => {
-      setCategories(response.data)
-    })
-    .catch(error =>{
-      console.log(error)
-    })
-  }, [setCategories])
+    axios
+      .get("http://localhost:8080/categories")
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [setCategories]);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/products')
-    .then(response => {
-      setProducts(response.data)
-    })
-    .catch(error =>{
-      console.log(error)
-    })
-  }, [setProducts, updateProduct])
+    axios
+      .get("http://localhost:8080/products")
+      .then((response) => {
+        setProducts(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [setProducts, updateProduct]);
 
-  const handleAddProducts = () =>{
+  const handleAddProducts = () => {
     const newProduct = {
       name: state.name,
       description: state.description,
-      price:state.price,
-      categoryID:categoryID
-    }
-    axios.post("http://localhost:8080/products", newProduct)
-    .then((response) => {
-      setProducts([...products, newProduct])
-      setUpdateProduct(!updateProduct)
-      const data = response.data;
-    })
-    .catch((console.error()))
-  }
+      price: state.price,
+      categoryID: categoryID,
+    };
+    axios
+      .post("http://localhost:8080/products", newProduct)
+      .then((response) => {
+        setProducts([...products, newProduct]);
+        setUpdateProduct(!updateProduct);
+        const data = response.data;
+      })
+      .catch(console.error());
+  };
+
   function onCloseModal() {
     setOpenModal(false);
     setState("");
+    setCategoryID("");
   }
 
-  const handleChangeProductCategory = (e) =>{
-    setCategoryID(e.target.value)
-  }
+  const handleChangeProductCategory = (e) => {
+    setCategoryID(e.target.value);
+  };
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
       <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
-        <h3 className="px-6 py-3 m-6 text-xl text-black font-medium">Product List</h3>
+        <h3 className="px-6 py-3 m-6 text-xl text-black font-medium">
+          Product List
+        </h3>
         <Button className="m-6" onClick={() => setOpenModal(true)} color="blue">
           Add New Product
         </Button>
@@ -106,11 +113,22 @@ export default function ProductsTable() {
                 <div className="mb-2 block">
                   <Label htmlFor="catgeory" value="Category" />
                 </div>
-                <Select onChange={handleChangeProductCategory} value={categoryID}name="options" required>
+                <Select
+                  onChange={handleChangeProductCategory}
+                  value={categoryID}
+                  name="options"
+                  required
+                >
                   <option>Choose Category</option>
                   {categories.map((category) => {
                     return (
-                      <option key={category.id} value={category.id} name='options'>{category.name}</option>
+                      <option
+                        key={category.id}
+                        value={category.id}
+                        name="options"
+                      >
+                        {category.name}
+                      </option>
                     );
                   })}
                 </Select>
@@ -119,7 +137,14 @@ export default function ProductsTable() {
                 <div className="mb-2 block">
                   <Label htmlFor="price" value="Price" />
                 </div>
-                <TextInput id="price" type="number" value={state.price} name="price" onChange={handleChange}required />
+                <TextInput
+                  id="price"
+                  type="number"
+                  value={state.price}
+                  name="price"
+                  onChange={handleChange}
+                  required
+                />
               </div>
               <div>
                 <div className="max-w-md">
@@ -138,7 +163,9 @@ export default function ProductsTable() {
                 </div>
               </div>
               <div className="w-full">
-                <Button color="blue" onClick={handleAddProducts}>Submit</Button>
+                <Button color="blue" onClick={handleAddProducts}>
+                  Submit
+                </Button>
               </div>
             </div>
           </Modal.Body>
@@ -162,30 +189,34 @@ export default function ProductsTable() {
           </tr>
         </thead>
         <tbody>
-        {products.map((product) => {
-          return (
-          <>
-          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-              
-              <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-              {product.name}
-            </th>
-            <td className="px-6 py-4">{categories.map((cat) => (product.categoryID === cat.id) ? cat.name : "")}</td>
-            <td className="px-6 py-4">${product.price}</td>
-            <td className="px-6 py-4 text-right">
-              <a
-                href="#"
-                className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td> 
-          </tr>
-          </>);
-        })}
+          {products.map((product) => {
+            return (
+              <>
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  >
+                    {product.name}
+                  </th>
+                  <td className="px-6 py-4">
+                    {categories.map((cat) =>
+                      product.categoryID === cat.id ? cat.name : ""
+                    )}
+                  </td>
+                  <td className="px-6 py-4">${product.price}</td>
+                  <td className="px-6 py-4 text-right">
+                    <a
+                      href="#"
+                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                    >
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+              </>
+            );
+          })}
         </tbody>
       </table>
     </div>
