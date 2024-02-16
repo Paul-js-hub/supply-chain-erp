@@ -25,7 +25,7 @@ export default function CategoriesTable (){
     .catch(error =>{
       console.log(error)
     })
-  }, [])
+  }, [setCategories])
 
   const handleChange = (e) => {
     setState({
@@ -34,12 +34,14 @@ export default function CategoriesTable (){
     });
   }
 
-  const handleSubmit = (e) => {
-    axios.post("http://localhost:8080/categories", {
+  const handleSubmit = () => {
+    const newCategory = {
       name: state.name,
       description: state.description
-    })
+    }
+    axios.post("http://localhost:8080/categories", newCategory)
     .then((response) => {
+      setCategories([...categories, newCategory])
       const data = response.data
     })
     .catch((console.error()))
