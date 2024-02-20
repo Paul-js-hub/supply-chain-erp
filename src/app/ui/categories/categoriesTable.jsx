@@ -26,6 +26,19 @@ export default function CategoriesTable() {
       });
   }, [setCategories]);
 
+  const fetchCategories = () => {
+    useEffect(() => {
+      axios
+        .get("http://localhost:8080/categories")
+        .then((response) => {
+          setCategories(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, [setCategories]);
+  }
+
   const handleChange = (e) => {
     setState({
       ...state,
@@ -49,15 +62,17 @@ export default function CategoriesTable() {
 
   const updateCategory = (category) => {
     const newCategory = {
-      name: state.name,
-      description: state.description,
+      name: category.name,
+      description: category.description,
     };
     axios
-      .put(`http://localhost:8080/categories/${category.id}`, newCategory)
-      .then((response) => {
-        const message = response.data.message;
-        setCategories([...categories. newCategory]);
-        toast.success(message)
+      .put(`http://localhost:8080/categories/${category.categoryID}`, newCategory)
+      .then(() => {
+       return axios.get("http://localhost:8080/categories/")
+      })
+      .then((res) => {
+        console.log("CATERES>>>", res.data)
+        setCategories(res.data)
       })
       .catch(console.error());
   };
@@ -149,7 +164,7 @@ export default function CategoriesTable() {
                   </th>
                   <td className="px-6 py-4">{category.description}</td>
                   <td className="px-6 py-4 text-right">
-                    <EditCategory categoryID={category.id}/>
+                    <EditCategory categoryID={category.id} updateCategory={updateCategory}/>
                   </td>
                 </tr>
               </>

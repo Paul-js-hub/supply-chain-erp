@@ -7,47 +7,10 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
-export default function EditCategory({ categoryID }) {
-  const [state, setState] = useState({
-    name: "",
-    description: "",
-  });
+export default function EditCategory({ categoryID, updateCategory }) {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  const [categories, setCategories] = useState([]);
-
-  const handleChange = (e) => {
-    setState({
-      ...state,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  useEffect(() => {
-    axios
-      .get(`http://localhost:8080/categories`)
-      .then((response) => {
-        console.log("EDITCAT>>>", response.data)
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [setCategories]);
-
-  const updateCategory = () => {
-    const newCategory = {
-      name: state.name,
-      description: state.description,
-    };
-    axios
-      .put(`http://localhost:8080/categories/${categoryID}`, newCategory)
-      .then((response) => {
-        const message = response.data.message;
-        setCategories(categories);
-        toast.success(message)
-      })
-      .catch(console.error());
-  };
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
 
   const onCloseUpdateModal = () => {
     setOpenUpdateModal(false);
@@ -82,9 +45,9 @@ export default function EditCategory({ categoryID }) {
               </div>
               <TextInput
                 id="product-name"
-                value={state.name}
+                value={name}
                 name="name"
-                onChange={handleChange}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -97,15 +60,15 @@ export default function EditCategory({ categoryID }) {
                   id="decription"
                   placeholder="Provide a description..."
                   name="description"
-                  value={state.description}
-                  onChange={handleChange}
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)}
                   required
                   rows={4}
                 />
               </div>
             </div>
             <div className="flex justify-center gap-4">
-              <Button color="blue" onClick={updateCategory}>
+              <Button color="blue" onClick={() => updateCategory({categoryID, name, description})}>
                 Save
               </Button>
               <Button color="gray" onClick={() => setOpenUpdateModal(false)}>
