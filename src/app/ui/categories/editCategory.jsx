@@ -1,13 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-
-import axios from "axios";
+import { useState } from "react";
 import { Modal, TextInput, Label, Button, Textarea } from "flowbite-react";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
-export default function EditCategory({ categoryID, updateCategory }) {
+export default function EditCategory({ id, updateCategory, categoryName, categoryDescription }) {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -46,6 +41,7 @@ export default function EditCategory({ categoryID, updateCategory }) {
               <TextInput
                 id="product-name"
                 value={name}
+                placeholder={categoryName}
                 name="name"
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -58,7 +54,7 @@ export default function EditCategory({ categoryID, updateCategory }) {
                 </div>
                 <Textarea
                   id="decription"
-                  placeholder="Provide a description..."
+                  placeholder={categoryDescription}
                   name="description"
                   value={description} 
                   onChange={(e) => setDescription(e.target.value)}
@@ -68,7 +64,7 @@ export default function EditCategory({ categoryID, updateCategory }) {
               </div>
             </div>
             <div className="flex justify-center gap-4">
-              <Button color="blue" onClick={() => updateCategory({categoryID, name, description})}>
+              <Button color="blue" onClick={() => updateCategory({id, name, description})}>
                 Save
               </Button>
               <Button color="gray" onClick={() => setOpenUpdateModal(false)}>

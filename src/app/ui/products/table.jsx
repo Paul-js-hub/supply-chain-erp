@@ -9,13 +9,15 @@ import {
   Select,
   Textarea,
 } from "flowbite-react";
+import { toast } from "react-toastify";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 export default function ProductsTable() {
   const [products, setProducts] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [openDeleteProductModal, setOpenDeleteProductModal] = useState(false);
   const [categoryID, setCategoryID] = useState("");
   const [categories, setCategories] = useState([]);
-  const [updateProduct, setUpdateProduct] = useState(false);
   const [state, setState] = useState({
     name: "",
     description: "",
@@ -49,7 +51,13 @@ export default function ProductsTable() {
       .catch((error) => {
         console.log(error);
       });
-  }, [setProducts, updateProduct]);
+  }, [setProducts]);
+
+  const fetchProducts = () => {
+    axios.get(`http://localhost:8080/products`).then((res) => {
+      setProducts(res.data);
+    });
+  };
 
   const handleAddProducts = () => {
     const newProduct = {
@@ -60,18 +68,35 @@ export default function ProductsTable() {
     };
     axios
       .post("http://localhost:8080/products", newProduct)
-      .then((response) => {
-        setProducts([...products, newProduct]);
-        setUpdateProduct(!updateProduct);
-        const data = response.data;
+      .then((res) => {
+        console.log("PRODUCTS>>>", res.data);
+        toast.success(res.data.message);
+        fetchProducts();
       })
       .catch(console.error());
   };
 
-  function onCloseModal() {
+  const handleDeleteProduct = (id) => {
+    console.log("ID>>>", id)
+    return
+    axios.delete(`http://localhost:8080/products/${id}`)
+    .then(response =>{
+      toast.success(response.data.message);
+      fetchProducts()
+    })
+    .catch(error =>{
+      console.log(error)
+    })
+  }
+
+  const onCloseModal = () =>{
     setOpenModal(false);
     setState("");
     setCategoryID("");
+  }
+
+  const onCloseDeleteProductModal = () =>{
+    setOpenDeleteProductModal(false);
   }
 
   const handleChangeProductCategory = (e) => {
@@ -207,11 +232,38 @@ export default function ProductsTable() {
                   <td className="px-6 py-4">${product.price}</td>
                   <td className="px-6 py-4 text-right">
                     <a
-                      href="#"
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      onClick={() => {setOpenDeleteProductModal(true)}}
+                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
                     >
-                      Edit
+                      Delete
                     </a>
+                    <Modal
+                      show={openDeleteProductModal}
+                      size="md"
+                      onClose={onCloseDeleteProductModal}
+                      popup
+                    >
+                      <Modal.Header />
+                      <Modal.Body>
+                        <div className="text-center">
+                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                          <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                            Are you sure you want to delete this product?
+                          </h3>
+                          <div className="flex justify-center gap-4">
+                            <Button
+                              color="failure"
+                              onClick={() => handleDeleteProduct(product.id)}
+                            >
+                              {"Yes, I'm sure"}
+                            </Button>
+                            <Button color="gray" onClick={onCloseDeleteProductModal}>
+                              No, cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </Modal.Body>
+                    </Modal>
                   </td>
                 </tr>
               </>

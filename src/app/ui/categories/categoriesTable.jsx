@@ -2,16 +2,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal, TextInput, Label, Button, Textarea } from "flowbite-react";
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
 import EditCategory from "@/app/ui/categories/editCategory";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import DeleteCategory from "@/app/ui/categories/deleteCategory";
 
 export default function CategoriesTable() {
   const [categories, setCategories] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [state, setState] = useState({
     name: "",
     description: "",
@@ -26,7 +23,7 @@ export default function CategoriesTable() {
       .catch((error) => {
         console.log(error);
       });
-  }, [setCategories]);
+  }, []);
 
   const handleChange = (e) => {
     setState({
@@ -43,8 +40,10 @@ export default function CategoriesTable() {
     axios
       .post("http://localhost:8080/categories", newCategory)
       .then((response) => {
-        setCategories([...categories, newCategory]);
-        const data = response.data;
+        toast.success(response.data.message);
+        axios.get("http://localhost:8080/categories/").then((res) => {
+          setCategories(res.data);
+        });
       })
       .catch(console.error());
   };
@@ -55,16 +54,12 @@ export default function CategoriesTable() {
       description: category.description,
     };
     axios
-      .put(
-        `http://localhost:8080/categories/${category.categoryID}`,
-        newCategory
-      )
-      .then(() => {
-        return axios.get("http://localhost:8080/categories/");
-      })
+      .put(`http://localhost:8080/categories/${category.id}`, newCategory)
       .then((res) => {
-        console.log("CATERES>>>", res.data);
-        setCategories(res.data);
+        toast.success(res.data.message);
+        axios.get("http://localhost:8080/categories/").then((res) => {
+          setCategories(res.data);
+        });
       })
       .catch(console.error());
   };
@@ -72,12 +67,11 @@ export default function CategoriesTable() {
   const deleteCategory = (id) => {
     axios
       .delete(`http://localhost:8080/categories/${id}`)
-      .then(() => {
-        return axios.get("http://localhost:8080/categories/");
-      })
       .then((res) => {
-        console.log(res.message)
-        setCategories(res.data)
+        toast.success(res.data.message);
+        axios.get("http://localhost:8080/categories/").then((res) => {
+          setCategories(res.data);
+        });
       })
       .catch(console.error());
   };
@@ -87,9 +81,6 @@ export default function CategoriesTable() {
     setState("");
   };
 
-  const onCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
       <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
@@ -162,60 +153,32 @@ export default function CategoriesTable() {
         </thead>
         <tbody>
           {categories.map((category) => {
+            console.log("CATEGORY>>>", category);
             return (
-              <>
-                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    {category.name}
-                  </th>
-                  <td className="px-6 py-4">{category.description}</td>
-                  <td className="px-6 py-4 text-right">
-                    <EditCategory
-                      categoryID={category.id}
-                      updateCategory={updateCategory}
-                    />
-                    <a
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
-                      onClick={() => setOpenDeleteModal(true)}
-                    >
-                      Delete
-                    </a>
-                    <Modal
-                      show={openDeleteModal}
-                      size="md"
-                      onClose={onCloseDeleteModal}
-                      popup
-                    >
-                      <Modal.Header />
-                      <Modal.Body>
-                        <div className="text-center">
-                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
-                          <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                            Are you sure you want to delete this product?
-                          </h3>
-                          <div className="flex justify-center gap-4">
-                            <Button
-                              color="failure"
-                              onClick={() => deleteCategory(category.id)}
-                            >
-                              {"Yes, I'm sure"}
-                            </Button>
-                            <Button
-                              color="gray"
-                              onClick={setOpenDeleteModal}
-                            >
-                              No, cancel
-                            </Button>
-                          </div>
-                        </div>
-                      </Modal.Body>
-                    </Modal>
-                  </td>
-                </tr>
-              </>
+              <tr
+                key={category.id}
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+              >
+                <th
+                  scope="row"
+                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  {category.name}
+                </th>
+                <td className="px-6 py-4">{category.description}</td>
+                <td className="px-6 py-4 text-right">
+                  <EditCategory
+                    id={category.id}
+                    categoryName={category.name}
+                    categoryDescription={category.description}
+                    updateCategory={updateCategory}
+                  />
+                  <DeleteCategory
+                    id={category.id}
+                    deleteCategory={deleteCategory}
+                  />
+                </td>
+              </tr>
             );
           })}
         </tbody>
