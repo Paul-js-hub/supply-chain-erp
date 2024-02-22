@@ -10,12 +10,11 @@ import {
   Textarea,
 } from "flowbite-react";
 import { toast } from "react-toastify";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import DeleteProduct from "@/app/ui/products/deleteProduct";
 
 export default function ProductsTable() {
   const [products, setProducts] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [openDeleteProductModal, setOpenDeleteProductModal] = useState(false);
   const [categoryID, setCategoryID] = useState("");
   const [categories, setCategories] = useState([]);
   const [state, setState] = useState({
@@ -69,7 +68,6 @@ export default function ProductsTable() {
     axios
       .post("http://localhost:8080/products", newProduct)
       .then((res) => {
-        console.log("PRODUCTS>>>", res.data);
         toast.success(res.data.message);
         fetchProducts();
       })
@@ -77,27 +75,22 @@ export default function ProductsTable() {
   };
 
   const handleDeleteProduct = (id) => {
-    console.log("ID>>>", id)
-    return
-    axios.delete(`http://localhost:8080/products/${id}`)
-    .then(response =>{
-      toast.success(response.data.message);
-      fetchProducts()
-    })
-    .catch(error =>{
-      console.log(error)
-    })
-  }
+    axios
+      .delete(`http://localhost:8080/products/${id}`)
+      .then((response) => {
+        toast.success(response.data.message);
+        fetchProducts();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-  const onCloseModal = () =>{
+  const onCloseModal = () => {
     setOpenModal(false);
     setState("");
     setCategoryID("");
-  }
-
-  const onCloseDeleteProductModal = () =>{
-    setOpenDeleteProductModal(false);
-  }
+  };
 
   const handleChangeProductCategory = (e) => {
     setCategoryID(e.target.value);
@@ -217,7 +210,10 @@ export default function ProductsTable() {
           {products.map((product) => {
             return (
               <>
-                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                <tr
+                  key={product.id}
+                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
                   <th
                     scope="row"
                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -231,39 +227,10 @@ export default function ProductsTable() {
                   </td>
                   <td className="px-6 py-4">${product.price}</td>
                   <td className="px-6 py-4 text-right">
-                    <a
-                      onClick={() => {setOpenDeleteProductModal(true)}}
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
-                    >
-                      Delete
-                    </a>
-                    <Modal
-                      show={openDeleteProductModal}
-                      size="md"
-                      onClose={onCloseDeleteProductModal}
-                      popup
-                    >
-                      <Modal.Header />
-                      <Modal.Body>
-                        <div className="text-center">
-                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
-                          <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                            Are you sure you want to delete this product?
-                          </h3>
-                          <div className="flex justify-center gap-4">
-                            <Button
-                              color="failure"
-                              onClick={() => handleDeleteProduct(product.id)}
-                            >
-                              {"Yes, I'm sure"}
-                            </Button>
-                            <Button color="gray" onClick={onCloseDeleteProductModal}>
-                              No, cancel
-                            </Button>
-                          </div>
-                        </div>
-                      </Modal.Body>
-                    </Modal>
+                    <DeleteProduct
+                      id={product.id}
+                      handleDeleteProduct={handleDeleteProduct}
+                    />
                   </td>
                 </tr>
               </>

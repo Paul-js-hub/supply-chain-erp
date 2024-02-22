@@ -153,7 +153,6 @@ export default function CategoriesTable() {
         </thead>
         <tbody>
           {categories.map((category) => {
-            console.log("CATEGORY>>>", category);
             return (
               <tr
                 key={category.id}
